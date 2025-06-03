@@ -1,6 +1,6 @@
 # pullio
 
-A cross-platform Go application that updates all Git repositories in a directory tree. It automatically locates Git repositories, detects their default branches, and performs a fast-forward pull to update them.
+A dead-simple cross-platform Go application that updates all Git repositories in a directory tree. It automatically locates Git repositories, detects their default branches, and performs a fast-forward pull to update them.
 
 ## Features
 
@@ -34,7 +34,7 @@ cd pullio
 go build -o bin/pullio cmd/pullio/main.go
 
 # Or build for a specific platform
-GOOS=windows GOARCH=amd64 go build -o pullio.exe cmd/pullio/main.go
+GOOS=windows GOARCH=amd64 go build -o bin/pullio.exe cmd/pullio/main.go
 ```
 
 ## Usage
