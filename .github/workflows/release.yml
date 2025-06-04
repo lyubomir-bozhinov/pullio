@@ -8,7 +8,8 @@ on:
 jobs:
   build:
     name: Build Cross-Platform Binaries
-    runs-on: alpine/git
+    runs-on: ubuntu-latest
+    container: alpine/git
 
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +40,8 @@ jobs:
 
   release:
     name: Create GitHub Release
-    runs-on: alpine/git
+    runs-on: ubuntu-latest
+    container: alpine/git
     needs: build
 
     steps:
