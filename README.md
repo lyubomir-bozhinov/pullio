@@ -43,7 +43,17 @@ cd pullio
 go build -o bin/pullio cmd/pullio/main.go
 
 # Or build for a specific platform
-GOOS=windows GOARCH=amd64 go build -o bin/pullio.exe cmd/pullio/main.go
+# For 64-bit Windows
+GOOS=windows GOARCH=amd64 go build -o bin/pullio-windows-amd64.exe cmd/pullio/main.go
+
+# For 64-bit Linux
+GOOS=linux GOARCH=amd64 go build -o bin/pullio-linux-amd64 cmd/pullio/main.go
+
+# For 64-bit macOS (Intel-based)
+GOOS=darwin GOARCH=amd64 go build -o bin/pullio-darwin-amd64 cmd/pullio/main.go
+
+# For 64-bit macOS (Apple Silicon)
+GOOS=darwin GOARCH=arm64 go build -o bin/pullio-darwin-arm64 cmd/pullio/main.go
 ```
 
 ## Usage
