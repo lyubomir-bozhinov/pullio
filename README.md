@@ -2,12 +2,21 @@
 
 A dead-simple cross-platform Go application that updates all Git repositories in a directory tree. It automatically locates Git repositories, detects their default branches, and performs a fast-forward pull to update them.
 
+## Disclaimer
+
+Yes, you can achieve this with one of the numerous variations of the line below:
+```bash
+find . -type d -name .git -exec sh -c "cd \"{}\"/../ && pwd && git pull" \;
+```
+
+Aliasing that with your SSH agent setup would yield an over-powered one-liner. So, why bother building pullio? Because we can.
+
 ## Features
 
 - Finds all Git repositories in a directory tree
 - Automatically sets up SSH agent and adds your SSH key if needed
 - Detects the default branch of each repository
-- Performs a fast-forward only pull to avoid merge conflicts
+- Pulls the latest changes to your local
 - Processes repositories concurrently for better performance
 - Works on Linux, macOS, and Windows
 - Provides clear, color-coded output with success/failure status

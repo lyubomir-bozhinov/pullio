@@ -15,16 +15,10 @@ import (
 	"golang.org/x/crypto/ssh/agent"
 )
 
-// ExecCommand is a variable that holds the exec.Command function.
-// It can be overridden in tests to mock exec.Command.
 var ExecCommand = exec.Command
 
-// NetDial is a variable that holds the net.Dial function.
-// It can be overridden in tests to mock net.Dial.
 var NetDial = net.Dial
 
-// EnsureAgentAndKey checks if ssh-agent is running and if the key is loaded.
-// If not, it attempts to start the agent and add the key.
 func EnsureAgentAndKey(sshKeyPath string) error {
 	// Expand ~ to home directory if present
 	if strings.HasPrefix(sshKeyPath, "~") {
@@ -35,12 +29,10 @@ func EnsureAgentAndKey(sshKeyPath string) error {
 		sshKeyPath = filepath.Join(homeDir, sshKeyPath[1:])
 	}
 	
-	// Check if the key file exists
 	if _, err := os.Stat(sshKeyPath); os.IsNotExist(err) {
 		return fmt.Errorf("SSH key does not exist: %s", sshKeyPath)
 	}
 	
-	// Get SSH_AUTH_SOCK
 	authSock := os.Getenv("SSH_AUTH_SOCK")
 	
 	// If SSH_AUTH_SOCK is not set, try to start ssh-agent
@@ -111,13 +103,11 @@ func startSSHAgent() error {
 		return fmt.Errorf("ssh-agent command failed: %w", err)
 	}
 	
-	// Parse the output to get environment variables
 	outputStr := string(output)
 	logger.Debug("ssh-agent output: %s", outputStr)
 	
-	// Windows has a different approach to set environment variables
+	// Windows has a different approach to set environment variables; just check that the service is running.
 	if runtime.GOOS == "windows" {
-		// Just check if the service is running
 		return nil
 	}
 	
@@ -148,7 +138,6 @@ func startSSHAgent() error {
 	// Give the agent a moment to fully initialize
 	time.Sleep(100 * time.Millisecond)
 	
-	// Verify that SSH_AUTH_SOCK is now set
 	if os.Getenv("SSH_AUTH_SOCK") == "" {
 		return errors.New("failed to set SSH_AUTH_SOCK environment variable")
 	}
@@ -156,9 +145,7 @@ func startSSHAgent() error {
 	return nil
 }
 
-// addSSHKey adds the specified SSH key to the agent
 func addSSHKey(sshKeyPath string) error {
-	// Check for different platforms
 	var cmd *exec.Cmd
 	
 	if runtime.GOOS == "windows" {

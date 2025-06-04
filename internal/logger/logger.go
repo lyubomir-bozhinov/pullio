@@ -37,12 +37,10 @@ func init() {
 	}
 }
 
-// SetVerbose sets the verbose logging mode
 func SetVerbose(v bool) {
 	verbose = v
 }
 
-// colored formats a string with color if colors are enabled
 func colored(color, format string, args ...interface{}) string {
 	message := fmt.Sprintf(format, args...)
 	
@@ -53,31 +51,26 @@ func colored(color, format string, args ...interface{}) string {
 	return message
 }
 
-// Info logs an informational message
 func Info(format string, args ...interface{}) {
 	message := colored(blue, "ℹ️ "+format, args...)
 	infoLogger.Println(message)
 }
 
-// Warning logs a warning message
 func Warning(format string, args ...interface{}) {
 	message := colored(yellow, "⚠️ "+format, args...)
 	warningLogger.Println(message)
 }
 
-// Error logs an error message
 func Error(format string, args ...interface{}) {
 	message := colored(red, "❌ "+format, args...)
 	errorLogger.Println(message)
 }
 
-// Success logs a success message
 func Success(format string, args ...interface{}) {
 	message := colored(green, "✅ "+format, args...)
 	successLogger.Println(message)
 }
 
-// Debug logs a debug message if verbose mode is enabled
 func Debug(format string, args ...interface{}) {
 	if !verbose {
 		return
@@ -87,16 +80,13 @@ func Debug(format string, args ...interface{}) {
 	debugLogger.Println(message)
 }
 
-// Fatal logs an error message and exits the program
 func Fatal(format string, args ...interface{}) {
 	message := colored(red, "💥 FATAL: "+format, args...)
 	errorLogger.Println(message)
 	os.Exit(1)
 }
 
-// RepoHeader logs a repository header
 func RepoHeader(repoPath string) {
-	// Get the relative or absolute path for display
 	displayPath := repoPath
 	cwd, err := os.Getwd()
 	if err == nil {

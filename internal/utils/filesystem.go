@@ -11,13 +11,11 @@ import (
 	"github.com/lyubomir-bozhinov/pullio/internal/logger"
 )
 
-// FileSystem interface allows mocking filesystem operations for testing
 type FileSystem interface {
 	Stat(name string) (os.FileInfo, error)
 	WalkDir(root string, fn fs.WalkDirFunc) error
 }
 
-// RealFileSystem implements FileSystem with real OS operations
 type RealFileSystem struct{}
 
 func (RealFileSystem) Stat(name string) (os.FileInfo, error) {
@@ -28,17 +26,13 @@ func (RealFileSystem) WalkDir(root string, fn fs.WalkDirFunc) error {
 	return filepath.WalkDir(root, fn)
 }
 
-// Default filesystem implementation
 var filesystem FileSystem = RealFileSystem{}
 
-// SetFileSystem allows setting a mock filesystem for testing
 func SetFileSystem(fs FileSystem) {
 	filesystem = fs
 }
 
-// FindGitDirs finds all .git directories starting from the given root path
 func FindGitDirs(root string) ([]string, error) {
-	// Standardize the root path
 	root, err := filepath.Abs(root)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get absolute path for %s: %w", root, err)
@@ -60,13 +54,11 @@ func FindGitDirs(root string) ([]string, error) {
 	
 	// Walk the directory tree to find .git directories
 	err = filesystem.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
-		// Check for errors accessing the path
 		if err != nil {
 			logger.Debug("Error accessing path %s: %v", path, err)
 			return filepath.SkipDir
 		}
 		
-		// Skip directories that typically don't contain Git repositories
 		if d.IsDir() {
 			name := d.Name()
 			
@@ -78,7 +70,6 @@ func FindGitDirs(root string) ([]string, error) {
 				return filepath.SkipDir
 			}
 			
-			// Check if current directory is a Git repository
 			gitPath := filepath.Join(path, ".git")
 			info, err := filesystem.Stat(gitPath)
 			if err == nil && info.IsDir() {

@@ -50,13 +50,11 @@ func main() {
 	logger.SetVerbose(verboseFlag)
 	defaultBranches := strings.Split(branchesFlag, ",")
 	
-	// Initialize SSH Agent
 	logger.Info("Initializing SSH agent...")
 	if err := sshagent.EnsureAgentAndKey(sshKeyFlag); err != nil {
 		logger.Fatal("SSH Agent setup failed: %v", err)
 	}
 	
-	// Find all Git repositories
 	logger.Info("Finding Git repositories from %s...", startPath)
 	startTime := time.Now()
 	gitDirs, err := utils.FindGitDirs(startPath)
@@ -89,7 +87,6 @@ func main() {
 		}(gitDir)
 	}
 	
-	// Close the result channel when all workers are done
 	go func() {
 		wg.Wait()
 		close(resultChan)
