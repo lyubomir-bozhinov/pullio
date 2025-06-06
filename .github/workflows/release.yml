@@ -9,7 +9,38 @@ jobs:
   build:
     name: Build Cross-Platform Binaries
     runs-on: ubuntu-latest
-    container: alpine/git
+
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            ext: ""
+            archive: tar.gz
+          - goos: linux
+            goarch: arm64
+            ext: ""
+            archive: tar.gz
+          - goos: linux
+            goarch: arm
+            ext: ""
+            archive: tar.gz
+          - goos: linux
+            goarch: 386
+            ext: ""
+            archive: tar.gz
+          - goos: windows
+            goarch: amd64
+            ext: ".exe"
+            archive: zip
+          - goos: darwin
+            goarch: amd64
+            ext: ""
+            archive: tar.gz
+          - goos: darwin
+            goarch: arm64
+            ext: ""
+            archive: tar.gz
 
     steps:
       - uses: actions/checkout@v4
@@ -22,39 +53,44 @@ jobs:
           go mod tidy
           go mod download
 
-      - run: |
+      - name: Build and compress binary
+        run: |
           mkdir -p bin
+          BINARY_NAME=pullio-${{ github.ref_name }}-${{ matrix.goos }}-${{ matrix.goarch }}
+          OUTPUT_NAME=$BINARY_NAME${{ matrix.ext }}
 
-          GOOS=linux GOARCH=amd64 go build -o bin/pullio-linux-amd64 cmd/pullio/main.go
+          # Build binary
+          env GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} \
+          go build -o $OUTPUT_NAME cmd/pullio/main.go
 
-          GOOS=windows GOARCH=amd64 go build -o bin/pullio-windows-amd64.exe cmd/pullio/main.go
-
-          GOOS=darwin GOARCH=amd64 go build -o bin/pullio-darwin-amd64 cmd/pullio/main.go
-
-          GOOS=darwin GOARCH=arm64 go build -o bin/pullio-darwin-arm64 cmd/pullio/main.go
+          # Package
+          if [[ "${{ matrix.archive }}" == "zip" ]]; then
+            zip -j bin/$BINARY_NAME.zip $OUTPUT_NAME
+          else
+            tar -czf bin/$BINARY_NAME.tar.gz $OUTPUT_NAME
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
-          name: pullio-binaries
+          name: pullio-binaries-${{ github.ref_name }}
           path: bin/
 
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    container: alpine/git
     needs: build
-    permissions: 
+    permissions:
       contents: write
 
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: pullio-binaries
+          name: pullio-binaries-${{ github.ref_name }}
 
       - id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          files: pullio-*-*
+          files: pullio-binaries-${{ github.ref_name }}/pullio-*.{zip,tar.gz}
           prerelease: false
           generate_release_notes: true
         env:
